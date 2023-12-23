@@ -24,11 +24,17 @@ Sheco is written in bash which means that it can be run natively on any distribu
 - MacOS
 - Windows (using wsl)
 
-It can be run in a terminal or in a console! This means any operating system, with a GUI or without one (server-install) will be able to run Sheco. 
+Check if you have bash installed in the right place by running:
+```
+ls /bin | grep bash
+```
+You should see at least a single line with only the word `bash` written in red.
+
+Sheco can be run in a terminal or in a console! This means any operating system, with a GUI or without one (server-install) will be able to run Sheco. 
 
 It is independant of the architecture of your CPU (x86, ARM or RISC-V) as it relies on the system-dependant pre-compiled binaries of the various programs in the GNU project that ship with any operating system made in the last 3 decades or any time after Brian Fox released bash under the GNU licence in 1989.
 
-AKA: if your computer turns on, this script will run!
+AKA: if your computer turns on, Sheco will run!
 
 ## Software Architecture
 Sheco is composed of 2 files:
