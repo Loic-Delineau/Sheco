@@ -7,7 +7,7 @@ Loïc Delineau
 ### Version
 unreleased, currently in branch: 
 ```
-devel
+[devel](https://github.com/Loic-Delineau/Sheco/tree/devel)
 ```
 
 
