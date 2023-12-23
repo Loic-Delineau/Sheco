@@ -9,14 +9,24 @@ Your Simple Shell Controller
 Loïc Delineau
 
 ### Version
-V1.O.0
+V0.0.1
 
 ## Introduction
-Sheco is a simple shell script (currently bash, but will be updated) that takes over a terminal and acts as a keyboard controller. 
+Sheco is a simple shell script using the \href[Bourne Again Shell or bash](https://en.wikipedia.org/wiki/Shell_script)) that takes over a terminal and acts as a keyboard controller. 
 
-Sheco is built to be the simplest solution to debug and develop any platform where there needs to be some kind of user input.
+Sheco is built to be the simplest solution to interact with any platform that requires some sort of user input.
 
-This is a rock-solid, multi use-case solution where the user can easily define the actions that happen when a key is pressed. From controlling characters in games to remotely piloting robotics platforms at the other end of the world. 
+Sheco is a rock-solid, multi use-case solution where the user can easily define the actions that happen when a key is pressed. From controlling characters in games to remotely actuating robotics platforms at the other end of the world.
+
+Sheco is written in bash which means that it can be run natively on any distribution of any operating system running on any platform, as long as it runs bash! Therefore, Sheco runs natively in:
+- Linux 
+- MacOS
+- Windows (using wsl)
+
+It can be run in a terminal or in a console! This means any operating system, with a GUI or without one (server-install) will be able to run Sheco. 
+
+It is independant of the architecture of your CPU (x86, ARM or RISC-V) as it relies on the system-dependant pre-compiled binaries of the various programs in the GNU project that ship with any operating system made in the last 3 decades or any time after Brian Fox released bash under the GNU licence in 1989.
+AKA: if your computer can turn on, this script will work!
 
 ## Software Architecture
 Sheco is composed of 2 files:
@@ -36,7 +46,7 @@ Sheco is executed by running:
 ### (2.) setup.txt
 setup.txt is the setup file where the user defines the actions performed when the user presses each keyboard key.
 
-Open setup.txt using your favorite text editor, you will be greeted by a file that respects the following format:
+Once you open setup.txt using your favorite text editor, you will be greeted by a file that respects the following format:
 
 ```
 # Comments are preceded by a "hashtag" or "pound" sign [string of text]
