@@ -1,0 +1,5 @@
+# Refresh Rate [seconds]
+0.1
+
+# Action on keypress: a [shell command]
+echo "Hello World!"
