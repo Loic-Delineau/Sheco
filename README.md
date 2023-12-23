@@ -12,12 +12,13 @@ Loïc Delineau
 V0.0.1
 
 ## Introduction
-Sheco is a simple shell script using the \href[Bourne Again Shell or bash](https://en.wikipedia.org/wiki/Shell_script)) that takes over a terminal and acts as a keyboard controller. 
+Sheco is a simple [shell script](https://en.wikipedia.org/wiki/Shell_script) using the Bourne Again Shell (or bash) that takes over a terminal and acts as a keyboard controller. 
 
 Sheco is built to be the simplest solution to interact with any platform that requires some sort of user input.
 
 Sheco is a rock-solid, multi use-case solution where the user can easily define the actions that happen when a key is pressed. From controlling characters in games to remotely actuating robotics platforms at the other end of the world.
 
+### Compatibility
 Sheco is written in bash which means that it can be run natively on any distribution of any operating system running on any platform, as long as it runs bash! Therefore, Sheco runs natively in:
 - Linux 
 - MacOS
@@ -26,7 +27,8 @@ Sheco is written in bash which means that it can be run natively on any distribu
 It can be run in a terminal or in a console! This means any operating system, with a GUI or without one (server-install) will be able to run Sheco. 
 
 It is independant of the architecture of your CPU (x86, ARM or RISC-V) as it relies on the system-dependant pre-compiled binaries of the various programs in the GNU project that ship with any operating system made in the last 3 decades or any time after Brian Fox released bash under the GNU licence in 1989.
-AKA: if your computer can turn on, this script will work!
+
+AKA: if your computer turns on, this script will run!
 
 ## Software Architecture
 Sheco is composed of 2 files:
