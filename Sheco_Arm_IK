@@ -1,0 +1,246 @@
+#!/bin/bash
+#
+# Author: Loïc Delineau
+# Date: December 2022
+#
+# DESCRIPTION OF SCRIPT ---------------------------------------------
+# This is a script that will take as input a value from the user on
+# the keyboard, feed it to the IK program, and send the values over
+# the MQTT network to control the rover
+# 1. Downside to this program is that you can only move one direction
+#    at a time because I stop reading user input after 1 character
+
+
+# $(tput setaf)    COLOUR CODE:
+# 1 RED
+# 2 GREEN
+# 3 YELLOW
+# 4
+# 5
+# 6
+# 7 WHITE
+
+
+# SETTING UP USER'S COMPUTER ========================================================
+echo "Welcome to the RViz Simulation Arm Controller Script"
+
+# Lauches mosquitto client
+mosquitto	
+
+# Setting up control Mode
+# 000: velocity JBJ
+# 010: velocity IK
+# 100: positional JBJ
+# 110: position IK
+mosquitto_pub -m "100" -t "/topic"
+
+
+echo ""
+
+# Setting up user's KEYBOARD LAYOUT ------------------------------------
+Xp="z"
+Yp="q"
+
+# Starting Controller
+echo "Press on any key to start the the controller" 
+
+# DEFINITIONS ========================================================================
+# Defining main constants
+step_size="2" 	#in [mm]
+pub_freq="2"	#in [Hz]	#NOT USING THIS, go look at for loop
+
+# Defining my initial values in space
+X="0"
+Y="0"
+Z="0"
+thetaR="0"
+thetaP="0"
+
+# Defining variables for the angles
+theta1="0"
+theta2="0"
+theta3="0"
+theta4="0"
+theta5="0"
+theta6="0"
+
+# FUNCTIONS ==========================================================================
+display_position() {
+	echo "========== POSITION IN SPACE =========="
+	echo "   [X, Y, Z]     = [$X, $Y, $Z][mm]"
+	echo "[thetaR, thetaP] = [$thetaR, $thetaP][degrees]"
+}
+
+display_joints() {
+	echo "========== STATE OF THE JOINTS =========="
+	echo "[theta1, theta2, theta3] = [$theta1, $theta2, $theta3][deg]"
+	echo "[theta4, theta5, theta6] = [$theta4, $theta5, $theta6][deg]"
+}
+
+# STARTS INFINITE LOOP ===============================================================
+while true; do
+	
+	# THROW AWAY INPUT CHARACTERS THAT ARE INPUTTED TOO FAST ---------------------
+	for ((i = 0 ; i < 10; i = i+1)); do
+		# Read all the user input (from current terminal (tty) 
+		# and timeout after 0.001 secods)
+		read -t 0.001 -r dir < /dev/tty
+		# Throw away that value and never use it
+		
+		# Wait a total of i*sleep	
+		sleep 0.01
+	done
+
+
+	# READ USE INPUT -------------------------------------------------------------
+	# Read from current terminal (tty) and return after 1 char
+	read -n 1 -r dir < /dev/tty	
+
+	# Keyboard input checking
+	if [[ "$dir" == "$Xp" ]]; then 
+		
+		# Clear screen
+		clear
+
+		# This is a simple addition
+		X=$((X + $step_size))
+		
+		# Display position on terminal for user
+		display_position
+
+		# Feed the current values in space to IK program and
+		# store the return values of it into the TMP variable
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+
+	elif [[ "$dir" == "s" ]]; then
+		clear
+		X=$((X - $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	elif [[ "$dir" == "$Yp" ]]; then
+		clear
+		Y=$((Y + $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	elif [[ "$dir" == "d" ]]; then
+		clear
+		Y=$((Y - $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	elif [[ "$dir" == "r" ]]; then
+		clear
+		Z=$((Z + $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	elif [[ "$dir" == "f" ]]; then
+		clear
+		Z=$((Z - $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	elif [[ "$dir" == "i" ]]; then
+		clear
+		thetaP=$((thetaP + $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	elif [[ "$dir" == "k" ]]; then
+		clear
+		thetaP=$((thetaP - $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	elif [[ "$dir" == "j" ]]; then
+		clear
+		thetaR=$((thetaR - $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	elif [[ "$dir" == "l" ]]; then
+		clear
+		thetaR=$((thetaR + $step_size))
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+	else
+		clear
+		display_position
+		TMP=`echo "$X $Y $Z $thetaR $thetaP" | ./IK`
+		echo "$(tput setaf 1)This key is not recognized!!$(tput setaf 7)"
+	
+	fi
+	
+	# DECODE THAT HUGE STRING INTO 6 INDEPENDANT VARIABLES -----------------------
+	theta1="${TMP%%,*}"
+	TMP="${TMP#*,}"
+	
+	theta2="${TMP%%,*}"
+	TMP="${TMP#*,}"
+	
+	theta3="${TMP%%,*}"
+	TMP="${TMP#*,}"
+	
+	theta4="${TMP%%,*}"
+	TMP="${TMP#*,}"
+	
+	theta5="${TMP%%,*}"
+	TMP="${TMP#*,}"
+	
+	theta6=$TMP
+
+	# Display on terminal for user
+	display_joints
+
+	# Display keybindings for user:
+	echo ""
+	echo ""
+	echo "To move X,      press $Xp or s"
+	echo "To move Y,      press $Yp or d"
+	echo "To move Z,      press r or f"
+	echo "To move thetaR, press j or l"
+	echo "To move thetaP, press i or k"
+
+
+
+
+	# Send those variables over the ROS Network ----------------------------
+	# COMMAND INTO FAKE FIRMWARE FROM OUR CONTROLLER = 6 speeds (1 2 3 4 5 6) and 6 angles (1 2 3 4 5 6)
+
+ros2 topic pub /arm/controller/speeds std_msgs/Float32MultiArray "layout:
+  dim:
+  - label: ''
+    size: 10
+    stride: 0
+  data_offset: 0
+data:
+- ${theta1%%.*} 
+- ${theta2%%.*}
+- ${theta3%%.*}
+- 0
+- ${theta4%%.*}
+- ${theta5%%.*}
+" &
+
+# Killing the previous process (ros2 node publisher) ------- (equiv to CTRL+c)
+# Get its PID
+#PID=$!
+#Wait for 2 seconds
+#sleep 2
+# Kill it
+#kill $PID
+
+ros2 topic pub /arm/controller/angles std_msgs/Float32MultiArray "layout:
+  dim:
+  - label: ''
+    size: 10
+    stride: 0
+  data_offset: 0
+data:
+- -180.0
+- 80.0
+- -135.0
+- -180.0
+- -90.0
+- -180.0
+" 
+
+	# Failsave to avoid arm runaway	
+	dir=""
+done
+
+
