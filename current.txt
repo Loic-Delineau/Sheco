@@ -1,0 +1,12 @@
+
+To receive message
+
+ros2 topic echo /microver/velocity/x std_msgs/msg/Bool
+
+
+
+To send message
+ros2 topic pub /microver/velocity/x std_msgs/msg/Bool "{data: 'false'}" -1 -w 0 --keep-alive 5
+
+-> false doesn't work, only receives true always
+

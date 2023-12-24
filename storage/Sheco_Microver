@@ -5,8 +5,8 @@
 #
 # DESCRIPTION OF SCRIPT ---------------------------------------------
 # This is a script that will take as input a value from the user on
-# the keyboard, feed it to the IK program, and send the values over
-# the MQTT network to control the rover
+# the keyboard and send the values over the ROS network to control the 
+# rover's direction
 # 1. Downside to this program is that you can only move one direction
 #    at a time because I stop reading user input after 1 character
 
@@ -22,19 +22,7 @@
 
 
 # SETTING UP USER'S COMPUTER ========================================================
-echo "Welcome to the RViz Simulation Arm Controller Script"
-
-# Lauches mosquitto client
-mosquitto	
-
-# Setting up control Mode
-# 000: velocity JBJ
-# 010: velocity IK
-# 100: positional JBJ
-# 110: position IK
-mosquitto_pub -m "100" -t "/topic"
-
-
+echo "Welcome to the Microver Controller Script"
 echo ""
 
 # Setting up user's KEYBOARD LAYOUT ------------------------------------
@@ -199,45 +187,7 @@ while true; do
 
 
 	# Send those variables over the ROS Network ----------------------------
-	# COMMAND INTO FAKE FIRMWARE FROM OUR CONTROLLER = 6 speeds (1 2 3 4 5 6) and 6 angles (1 2 3 4 5 6)
-
-ros2 topic pub /arm/controller/speeds std_msgs/Float32MultiArray "layout:
-  dim:
-  - label: ''
-    size: 10
-    stride: 0
-  data_offset: 0
-data:
-- ${theta1%%.*} 
-- ${theta2%%.*}
-- ${theta3%%.*}
-- 0
-- ${theta4%%.*}
-- ${theta5%%.*}
-" &
-
-# Killing the previous process (ros2 node publisher) ------- (equiv to CTRL+c)
-# Get its PID
-#PID=$!
-#Wait for 2 seconds
-#sleep 2
-# Kill it
-#kill $PID
-
-ros2 topic pub /arm/controller/angles std_msgs/Float32MultiArray "layout:
-  dim:
-  - label: ''
-    size: 10
-    stride: 0
-  data_offset: 0
-data:
-- -180.0
-- 80.0
-- -135.0
-- -180.0
-- -90.0
-- -180.0
-" 
+	ros2 topic pub -1 /microver/velocity/x std_msgs/msg/Int8 "{data: '${theta1%%.*}'}"
 
 	# Failsave to avoid arm runaway	
 	dir=""
