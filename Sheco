@@ -8,7 +8,8 @@
 # which will call a list of predefined commands (in setup.txt) 
 # 1. Downside to this program is that you can only trigger one action
 #    at a time because Sheco stops reading user input after 1 character
-
+# 2. Dowside to this program is that when you use ROS, every keypress
+#    leads to a new node being launched which takes forever
 
 # $(tput setaf)    COLOUR CODE:
 # 1 RED
@@ -24,26 +25,126 @@
 echo "Welcome to the Sheco"
 echo ""
 
-# Setting up user's KEYBOARD LAYOUT ------------------------------------
+# Setting up user's KEYBOARD LAYOUT 
 #Xp="z"
 #Yp="q"
 
 
-# Launching Nodes for 100 seconds
-ros2 topic pub /microver/velocity/x std_msgs/msg/Bool "{data: 'false'}" -1 -w 0 --keep-alive 100
-
 # PARSING setup.txt ==================================================================
+# Yeeting directory
+if [ -d "./parser" ]; then
+	rm -rf parser
+fi
+
+# Making clean directory
+mkdir parser
+
+# Copying setup.txt into new directory and moving there
+cp setup.txt ./parser
+cd parser
+
+# a.txt ----------
+# Saving the first commands into a.txt after removal of blank lines
+# saving the rest into temp.txt
+cat setup.txt | awk '/./{p=1}p' | awk 'BEGIN {output="a.txt"} /^$/ {output="temp.txt"; end} {print > output}'
+
+# Removing all the comments from the file
+sed '/#/d' a.txt > atemp.txt
+mv atemp.txt a.txt
+
+# Adding Shebangs to the file to make it an executable script
+echo -e "#! /bin/bash\n$(cat a.txt)" > a.txt
+
+# b.txt ----------
+cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="b.txt"} /^$/ {output="temp.txt"; end} {print > output}'
+sed '/#/d' b.txt > btemp.txt
+mv btemp.txt b.txt
+echo -e "#! /bin/bash\n$(cat b.txt)" > b.txt
+
+# c.txt ----------
+cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="c.txt"} /^$/ {output="temp.txt"; end} {print > output}'
+sed '/#/d' c.txt > ctemp.txt
+mv ctemp.txt c.txt
+echo -e "#! /bin/bash\n$(cat c.txt)" > c.txt
+
+# d.txt ----------
+cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="d.txt"} /^$/ {output="temp.txt"; end} {print > output}'
+sed '/#/d' d.txt > dtemp.txt
+mv dtemp.txt d.txt
+echo -e "#! /bin/bash\n$(cat d.txt)" > d.txt
+
+# Renaming all the scripts to the user's keyboard
+mv a.txt z.txt
+mv b.txt s.txt
+mv c.txt q.txt
+#mv d.txt d.txt
 
 
+# Moving back up to Sheco root directory
+cd ..
 
 # DEFINITIONS ========================================================================
 
 
 
 # FUNCTIONS ==========================================================================
-display_position() {
-	echo "========== POSITION IN SPACE =========="
+# Display keybindings for user:
+display_keybindings() {
+	echo "- - - - - Keybindings - - - - - "
+	echo "| To move X,      press z or s |"
+	echo "| To move Y,      press q or d |"
+	echo "| To move Z,      press r or f |"
+	echo "| To move thetaR, press j or l |"
+	echo "| To move thetaP, press i or k |"
+	echo "- - - - - - - - - - - - - - - - "
+	echo ""
 }
+
+# Display no key pressed
+display_none() {
+	echo "> z: "
+	echo "> s: "
+	echo "> q: "
+	echo "> d: "
+	echo ""
+}
+
+# Display z pressed
+display_z() {
+	echo "> z: pressed"
+	echo "> s: "
+	echo "> q: "
+	echo "> d: "
+	echo ""
+}
+
+# Display s pressed
+display_s() {
+	echo "> z: "
+	echo "> s: pressed"
+	echo "> q: "
+	echo "> d: "
+	echo ""
+}
+
+# Display q pressed
+display_q() {
+	echo "> z: "
+	echo "> s: "
+	echo "> q: pressed"
+	echo "> d: "
+	echo ""
+}
+
+# Display d pressed
+display_d() {
+	echo "> z: "
+	echo "> s: "
+	echo "> q: "
+	echo "> d: pressed"
+	echo ""
+}
+
 
 
 # Starting Controller
@@ -73,77 +174,50 @@ while true; do
 		
 		# Clear screen
 		clear
-		
-		# Display position on terminal for user
-		display_position
-echo "z was pressed"
-
+				
+		# Display pressed keys on terminal for user
+		display_keybindings
+		display_z
+	
 		# Execute User Command
-ros2 topic pub /microver/velocity/x std_msgs/msg/Bool \"{data: 'true'}\" -1 -w 0
-
-# This still takes too long, I think this terminal solution will never work smoothly
-# with ROS as it take too long to spin up a node to publish a message on a topic.
-# It makes more sense to have a dedicated topic always alive and pumping out the keyboard info
-# ...
+		echo "Running command ... wait"
+		bash ./parser/z.txt
 
 	elif [[ "$dir" == "s" ]]; then
 		clear
-		X=$((X - $step_size))
-		display_position
-	elif [[ "$dir" == "$Yp" ]]; then
+		display_keybindings	
+		display_s	
+		echo "Running command ... wait"
+		bash ./parser/s.txt
+	elif [[ "$dir" == "q" ]]; then
 		clear
-		Y=$((Y + $step_size))
-		display_position
+		display_keybindings	
+		display_q	
+		echo "Running command ... wait"
+		bash ./parser/q.txt
 	elif [[ "$dir" == "d" ]]; then
 		clear
-		Y=$((Y - $step_size))
-		display_position
-	elif [[ "$dir" == "r" ]]; then
-		clear
-		Z=$((Z + $step_size))
-		display_position
-	elif [[ "$dir" == "f" ]]; then
-		clear
-		Z=$((Z - $step_size))
-		display_position
-	elif [[ "$dir" == "i" ]]; then
-		clear
-		thetaP=$((thetaP + $step_size))
-		display_position
-	elif [[ "$dir" == "k" ]]; then
-		clear
-		thetaP=$((thetaP - $step_size))
-		display_position
-	elif [[ "$dir" == "j" ]]; then
-		clear
-		thetaR=$((thetaR - $step_size))
-		display_position
-	elif [[ "$dir" == "l" ]]; then
-		clear
-		thetaR=$((thetaR + $step_size))
-		display_position
+		display_keybindings	
+		display_d	
+		echo "Running command ... wait"
+		bash ./parser/d.txt
 	else
 		clear
-		display_position
+		display_keybindings
+		display_none
 		echo "$(tput setaf 1)This key is not recognized!!$(tput setaf 7)"
-	
+		sleep 0.5	
 	fi
 	
 
-	# Display keybindings for user:
-	echo ""
-	echo ""
-	echo "To move X,      press z or s"
-	echo "To move Y,      press s or d"
-	echo "To move Z,      press r or f"
-	echo "To move thetaR, press j or l"
-	echo "To move thetaP, press i or k"
-
-
-	# Send those variables over the ROS Network ----------------------------
 
 	# Failsave to avoid arm runaway	
 	dir=""
+		
+	# Clear Screen and previously pressed keys
+	clear
+	display_keybindings	
+	display_none
 done
 
 

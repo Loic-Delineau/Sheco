@@ -1,5 +1,14 @@
-# Refresh Rate [seconds]
-0.1
+# Action on keypress: z [shell command]
+ros2 topic pub /microver/velocity/x std_msgs/msg/Int8 "{data: 1}" -1 -w 0 -p 2
 
-# Action on keypress: a [shell command]
-echo "Hello World!"
+# Action on keypress: s [shell command]
+ros2 topic pub /microver/velocity/x std_msgs/msg/Int8 "{data: -1}" -1 -w 0 -p 2
+
+# Action on keypress: q [shell command]
+ros2 topic pub /microver/velocity/y std_msgs/msg/Int8 "{data: 1}" -1 -w 0 -p 2
+
+# Action on keypress: d [shell command]
+ros2 topic pub /microver/velocity/y std_msgs/msg/Int8 "{data: -1}" -1 -w 0 -p 2
+
+
+
