@@ -2,7 +2,7 @@
 Your Simple Shell Controller
 
 <p align="center">
-    <img src="assets/mission_patch_v3.png">
+    <img src="Sheco_logo_nobackground.png">
 </p>
 
 ### Author
