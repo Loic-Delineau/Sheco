@@ -20,74 +20,31 @@
 # 6
 # 7 WHITE
 
-
-# SETTING UP USER'S COMPUTER ========================================================
-echo "Welcome to the Sheco"
-echo ""
-
-# Setting up user's KEYBOARD LAYOUT 
-#Xp="z"
-#Yp="q"
-
-
-# PARSING setup.txt ==================================================================
-# Yeeting directory
-if [ -d "./parser" ]; then
-	rm -rf parser
-fi
-
-# Making clean directory
-mkdir parser
-
-# Copying setup.txt into new directory and moving there
-cp setup.txt ./parser
-cd parser
-
-# a.txt ----------
-# Saving the first commands into a.txt after removal of blank lines
-# saving the rest into temp.txt
-cat setup.txt | awk '/./{p=1}p' | awk 'BEGIN {output="a.txt"} /^$/ {output="temp.txt"; end} {print > output}'
-
-# Removing all the comments from the file
-sed '/#/d' a.txt > atemp.txt
-mv atemp.txt a.txt
-
-# Adding Shebangs to the file to make it an executable script
-echo -e "#! /bin/bash\n$(cat a.txt)" > a.txt
-
-# b.txt ----------
-cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="b.txt"} /^$/ {output="temp.txt"; end} {print > output}'
-sed '/#/d' b.txt > btemp.txt
-mv btemp.txt b.txt
-echo -e "#! /bin/bash\n$(cat b.txt)" > b.txt
-
-# c.txt ----------
-cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="c.txt"} /^$/ {output="temp.txt"; end} {print > output}'
-sed '/#/d' c.txt > ctemp.txt
-mv ctemp.txt c.txt
-echo -e "#! /bin/bash\n$(cat c.txt)" > c.txt
-
-# d.txt ----------
-cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="d.txt"} /^$/ {output="temp.txt"; end} {print > output}'
-sed '/#/d' d.txt > dtemp.txt
-mv dtemp.txt d.txt
-echo -e "#! /bin/bash\n$(cat d.txt)" > d.txt
-
-# Renaming all the scripts to the user's keyboard
-mv a.txt z.txt
-mv b.txt s.txt
-mv c.txt q.txt
-#mv d.txt d.txt
-
-
-# Moving back up to Sheco root directory
-cd ..
-
-# DEFINITIONS ========================================================================
-
-
-
 # FUNCTIONS ==========================================================================
+# Display setup.txt
+display_setuptxt() {
+	echo ""
+	echo ""
+	echo "setup.txt"
+	echo "---------------------------------------"
+	cat setup.txt
+	echo "---------------------------------------"
+	echo ""
+	
+	# Display possible actions
+	display_menu
+	
+	# Treat user-input
+	sheco_menu		
+}
+
+# Display User Actions in Menu
+display_menu() {
+	echo "$(tput setaf 2)Actions:$(tput setaf 7) Start Sheco     -  type 's'"
+	echo "         View setup.txt  -  type 'v' "
+	echo ""
+}
+
 # Display keybindings for user:
 display_keybindings() {
 	echo "- - - - - Keybindings - - - - - "
@@ -144,6 +101,108 @@ display_d() {
 	echo "> d: pressed"
 	echo ""
 }
+
+# Display Menu and Wait for User Input
+sheco_menu() {
+
+	# Failsafe for wrong value inputted
+	fail="1"
+
+	while [[ "$fail" == "1" ]]; do
+
+		# Read 1 input char
+		echo -n "> "
+		read -n 1 -r cmd < /dev/tty	
+		
+		# Keyboard input checking
+		if [[ "$cmd" == "s" ]]; then
+			fail="0"
+			echo ""
+		elif [[ "$cmd" == "v" ]]; then
+			display_setuptxt
+			fail="0"
+			echo ""
+		else 
+			echo -e "\nUnknown key..."	
+		fi
+	done
+
+}
+
+
+
+# WELCOME SCREEN ===========================================================
+# Display logoscript
+clear && echo "" && bash ./assets/logoscript.sh  && echo ""
+sheco_menu
+
+# SETTING UP USER'S COMPUTER ========================================================
+echo "Welcome to the Sheco"
+echo ""
+
+# Setting up user's KEYBOARD LAYOUT 
+#Xp="z"
+#Yp="q"
+
+
+# PARSING setup.txt ==================================================================
+# Yeeting old directory
+if [ -d "./parser" ]; then
+	rm -rf parser
+fi
+
+# Making clean directory
+mkdir parser
+
+# Copying setup.txt into new directory and moving there
+cp setup.txt ./parser
+cd parser
+
+# a.txt ----------
+# Saving the first commands into a.txt after removal of blank lines
+# saving the rest into temp.txt
+cat setup.txt | awk '/./{p=1}p' | awk 'BEGIN {output="a.txt"} /^$/ {output="temp.txt"; end} {print > output}'
+
+# Removing all the comments from the file
+
+sed '/#/d' a.txt > atemp.txt
+mv atemp.txt a.txt
+
+# Adding Shebangs to the file to make it an executable script
+echo -e "#! /bin/bash\n$(cat a.txt)" > a.txt
+
+# b.txt ----------
+cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="b.txt"} /^$/ {output="temp.txt"; end} {print > output}'
+sed '/#/d' b.txt > btemp.txt
+mv btemp.txt b.txt
+echo -e "#! /bin/bash\n$(cat b.txt)" > b.txt
+
+# c.txt ----------
+cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="c.txt"} /^$/ {output="temp.txt"; end} {print > output}'
+sed '/#/d' c.txt > ctemp.txt
+mv ctemp.txt c.txt
+echo -e "#! /bin/bash\n$(cat c.txt)" > c.txt
+
+# d.txt ----------
+cat temp.txt | awk '/./{p=1}p' | awk 'BEGIN {output="d.txt"} /^$/ {output="temp.txt"; end} {print > output}'
+sed '/#/d' d.txt > dtemp.txt
+mv dtemp.txt d.txt
+echo -e "#! /bin/bash\n$(cat d.txt)" > d.txt
+
+# Renaming all the scripts to the user's keyboard
+mv a.txt z.txt
+mv b.txt s.txt
+mv c.txt q.txt
+#mv d.txt d.txt
+
+
+# Moving back up to Sheco root directory
+cd ..
+
+# DEFINITIONS ========================================================================
+
+
+
 
 
 
