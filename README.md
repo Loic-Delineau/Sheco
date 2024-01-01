@@ -2,7 +2,7 @@
 Your Simple Shell Controller
 
 <p align="center">
-    <img src="sheco_remapped.png">
+    <img src="sheco_remapped_bis.png">
 </p>
 
 ### Author
